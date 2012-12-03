@@ -38,6 +38,19 @@ public class AutorDao {
     }
   }
 
+  public void alterar(Autor autor) throws SQLException {
+    sql = "update autores set nome = ?, nascimento = ? where id = " + autor.getId();
+    try {
+      pstmt = this.conexao.prepareStatement(sql);
+      pstmt.setString(1, autor.getNome().toUpperCase());
+      pstmt.setDate(2, autor.getNascimento());
+      pstmt.executeUpdate();
+      pstmt.close();
+    } catch (SQLException e) {
+      System.out.println(e.getLocalizedMessage());
+    }
+  }
+
   public static boolean existemRegistros(String texto) throws SQLException, ClassNotFoundException {
     boolean existe = false;
     String consulta = "select count(id) as qtde from autores where upper(nome) like upper('%" + texto + "%')";
@@ -55,10 +68,10 @@ public class AutorDao {
     return existe;
   }
 
-  public ResultSet listaPorNome(String texto) throws SQLException, ClassNotFoundException {
+  public ResultSet listaAutores(String texto) throws SQLException, ClassNotFoundException {
     ResultSet autores = null;
     if (existemRegistros(texto)) {
-      sql = "select * from autores where upper(nome) like upper('%" + texto + "%') order by nome";
+      sql = "select * from autores where upper(nome) like upper('%" + texto + "%') order by id";
       try {
         stmt = conexao.createStatement();
         stmt.executeQuery(sql);
@@ -81,5 +94,11 @@ public class AutorDao {
       Funcoes.erro(ex.getLocalizedMessage());
     }
     return autor;
+  }
+
+  public void excluir(Autor autor) throws SQLException {
+    sql = "delete from autores where id=" + autor.getId();
+    stmt = this.conexao.prepareStatement(sql);
+    stmt.execute(sql);
   }
 }

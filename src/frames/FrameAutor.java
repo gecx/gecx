@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -22,20 +23,14 @@ public class FrameAutor extends javax.swing.JFrame {
   String sql = null;
   Statement stmt = null;
   ResultSet result = null;
+  ResultSet listAutores = null;
+  int opcao = 0;
   FormataData dataBr = new FormataData();
 
   class CenterRenderer extends DefaultTableCellRenderer {
 
     public CenterRenderer() {
       setHorizontalAlignment(CENTER);
-    }
-  }
-
-  class DateRenderer extends DefaultTableCellRenderer {
-
-    public DateRenderer() {
-      SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy");
-
     }
   }
 
@@ -58,6 +53,7 @@ public class FrameAutor extends javax.swing.JFrame {
     TableCellRenderer center = new CenterRenderer();
     jTable1.getColumnModel().getColumn(0).setCellRenderer(center);
     jTable1.getColumnModel().getColumn(2).setCellRenderer(center);
+    Funcoes.desabilitaBotoes(btExcluir, btAlterar, btSalvar, btCancelar);
   }
 
   @SuppressWarnings("unchecked")
@@ -76,12 +72,21 @@ public class FrameAutor extends javax.swing.JFrame {
     jLabel3 = new javax.swing.JLabel();
     jLabel4 = new javax.swing.JLabel();
     txtCodigo = new javax.swing.JTextField();
+    btAlterar = new javax.swing.JButton();
+    btCancelar = new javax.swing.JButton();
+    btExcluir = new javax.swing.JButton();
+    btSair = new javax.swing.JButton();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("CADASTRO DE AUTORES");
     setResizable(false);
 
     btNovo.setText("Novo");
+    btNovo.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btNovoActionPerformed(evt);
+      }
+    });
 
     jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
     jLabel1.setText("Nome:");
@@ -141,6 +146,34 @@ public class FrameAutor extends javax.swing.JFrame {
 
     txtCodigo.setEditable(false);
 
+    btAlterar.setText("Alterar");
+    btAlterar.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btAlterarActionPerformed(evt);
+      }
+    });
+
+    btCancelar.setText("Cancelar");
+    btCancelar.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btCancelarActionPerformed(evt);
+      }
+    });
+
+    btExcluir.setText("Excluir");
+    btExcluir.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btExcluirActionPerformed(evt);
+      }
+    });
+
+    btSair.setText("Sair");
+    btSair.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btSairActionPerformed(evt);
+      }
+    });
+
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
     getContentPane().setLayout(layout);
     layout.setHorizontalGroup(
@@ -149,30 +182,37 @@ public class FrameAutor extends javax.swing.JFrame {
         .addContainerGap()
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
           .addComponent(jScrollPane1)
-          .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-              .addComponent(btNovo, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-              .addComponent(btSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(layout.createSequentialGroup()
-              .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                .addComponent(jLabel2)
-                .addComponent(jLabel4))
-              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-              .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                .addComponent(txtNascimento, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
-                .addComponent(txtCodigo))
-              .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                  .addGap(18, 18, 18)
-                  .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                  .addGap(18, 18, 18)
-                  .addComponent(txtNome))
-                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                  .addGap(154, 154, 154)
-                  .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(txtPesquisa, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+          .addGroup(layout.createSequentialGroup()
+            .addComponent(btNovo, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(btAlterar, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(btCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(btSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(btExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(btSair, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
+          .addGroup(layout.createSequentialGroup()
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+              .addComponent(jLabel2)
+              .addComponent(jLabel4))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+              .addComponent(txtNascimento, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+              .addComponent(txtCodigo))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addGroup(layout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(txtNome))
+              .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(154, 154, 154)
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtPesquisa, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)))))
         .addContainerGap())
     );
     layout.setVerticalGroup(
@@ -191,11 +231,15 @@ public class FrameAutor extends javax.swing.JFrame {
           .addComponent(txtPesquisa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
           .addComponent(jLabel3))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
+        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
         .addGap(18, 18, 18)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
           .addComponent(btNovo)
-          .addComponent(btSalvar))
+          .addComponent(btSalvar)
+          .addComponent(btAlterar)
+          .addComponent(btCancelar)
+          .addComponent(btExcluir)
+          .addComponent(btSair))
         .addContainerGap())
     );
 
@@ -212,11 +256,30 @@ public class FrameAutor extends javax.swing.JFrame {
 
       autor.setNome(txtNome.getText());
       autor.setNascimento(data2);
-      dao.inserir(autor);
-    } catch (SQLException | ParseException ex) {
-      System.out.println(ex.getLocalizedMessage());
+      if (opcao == 0) {
+        dao.inserir(autor);
+      } else if (opcao == 1) {
+        autor.setId(Integer.parseInt(txtCodigo.getText()));
+        dao.alterar(autor);
+      }
+      listAutores = dao.listaAutores(txtPesquisa.getText());
+      preencheGrid(listAutores);
+      Funcoes.desabilitaBotoes(btSalvar, btCancelar);
+      Funcoes.habilitaBotoes(btAlterar, btExcluir, btSair, btNovo);
+      Funcoes.desabilitaEdits(txtNome, txtNascimento);
+    } catch (SQLException | ClassNotFoundException | ParseException ex) {
+      Funcoes.informacao(ex.getLocalizedMessage());
     }
   }//GEN-LAST:event_btSalvarActionPerformed
+
+  private void preencheGrid(ResultSet dados) throws SQLException {
+    Funcoes.removeLinha(model);
+    while (dados.next()) {
+      String vnasc = dataBr.getDataBR(dados.getDate("nascimento"));
+      String codigo = new java.text.DecimalFormat("000").format(new Integer(dados.getInt("id")));
+      model.addRow(new Object[]{codigo, dados.getString("nome"), vnasc});
+    }
+  }
 
   private void txtPesquisaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPesquisaKeyPressed
     if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
@@ -227,12 +290,8 @@ public class FrameAutor extends javax.swing.JFrame {
           Funcoes.informacao("Nenhum Autor Localizado!");
           txtPesquisa.requestFocusInWindow();
         } else {
-          ResultSet listAutores = dao.listaPorNome(txtPesquisa.getText());
-          while (listAutores.next()) {
-            String vnasc = dataBr.getDataBR(listAutores.getDate("nascimento"));
-            String codigo = new java.text.DecimalFormat("000").format(new Integer(listAutores.getInt("id")));
-            model.addRow(new Object[]{codigo, listAutores.getString("nome"), vnasc});
-          }
+          ResultSet listAutores = dao.listaAutores(txtPesquisa.getText());
+          preencheGrid(listAutores);
         }
       } catch (SQLException | ClassNotFoundException ex) {
         Funcoes.erro(ex.getMessage());
@@ -253,11 +312,59 @@ public class FrameAutor extends javax.swing.JFrame {
           txtNome.setText(autor.getString("nome"));
           txtNascimento.setText(dataBr.getDataBR(autor.getDate("nascimento")));
         }
+        Funcoes.habilitaBotoes(btAlterar, btExcluir, btNovo, btSair);
       } catch (SQLException e) {
         Funcoes.informacao(e.getLocalizedMessage());
       }
     }
   }//GEN-LAST:event_jTable1MouseClicked
+
+  private void btNovoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btNovoActionPerformed
+    opcao = 0;
+    Funcoes.removeLinha(model);
+    Funcoes.limpaEdits(txtCodigo, txtNascimento, txtNome, txtPesquisa);
+    Funcoes.habilitaEdits(txtNascimento, txtNome);
+    Funcoes.desabilitaBotoes(btNovo, btExcluir, btSair, btAlterar);
+    Funcoes.habilitaBotoes(btSalvar, btCancelar);
+    txtNome.requestFocusInWindow();
+  }//GEN-LAST:event_btNovoActionPerformed
+
+  private void btSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSairActionPerformed
+    this.dispose();
+  }//GEN-LAST:event_btSairActionPerformed
+
+  private void btAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAlterarActionPerformed
+    opcao = 1;
+    Funcoes.habilitaBotoes(btCancelar, btSalvar);
+    Funcoes.desabilitaBotoes(btAlterar, btExcluir, btNovo, btSair);
+    Funcoes.habilitaEdits(txtNome, txtNascimento);
+    txtNome.requestFocusInWindow();
+  }//GEN-LAST:event_btAlterarActionPerformed
+
+  private void btCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCancelarActionPerformed
+    Funcoes.desabilitaBotoes(btSalvar, btCancelar);
+    Funcoes.habilitaBotoes(btAlterar, btExcluir, btSair, btNovo);
+    Funcoes.desabilitaEdits(txtNome, txtNascimento);
+  }//GEN-LAST:event_btCancelarActionPerformed
+
+  private void btExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btExcluirActionPerformed
+    dao = new AutorDao();
+    Autor autor = new Autor();
+    int linha = jTable1.getSelectedRow();
+    String codigo = model.getValueAt(linha, 0).toString();
+    autor.setId(Integer.parseInt(codigo));
+    if (JOptionPane.showConfirmDialog(this, "Confirma Exclusão?", "Confirmação", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+      try {
+        dao.excluir(autor);
+        listAutores = dao.listaAutores("");
+        preencheGrid(listAutores);
+        Funcoes.limpaEdits(txtCodigo, txtNome, txtNascimento);
+        Funcoes.desabilitaBotoes(btExcluir, btAlterar);
+      } catch (SQLException | ClassNotFoundException ex) {
+        Funcoes.erro(ex.getLocalizedMessage());
+      }
+    }
+  }//GEN-LAST:event_btExcluirActionPerformed
 
   public static void main(String args[]) {
     java.awt.EventQueue.invokeLater(new Runnable() {
@@ -272,7 +379,11 @@ public class FrameAutor extends javax.swing.JFrame {
     });
   }
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JButton btAlterar;
+  private javax.swing.JButton btCancelar;
+  private javax.swing.JButton btExcluir;
   private javax.swing.JButton btNovo;
+  private javax.swing.JButton btSair;
   private javax.swing.JButton btSalvar;
   private javax.swing.JLabel jLabel1;
   private javax.swing.JLabel jLabel2;
